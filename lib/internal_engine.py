@@ -7,7 +7,10 @@ from Bio import SeqIO
 from glob import glob
 from subprocess import run
 from collections import Counter
-from lib.utils import emapper_ofile_fmt, cr, highest_value_with_percentage, create_directory, corruption_test, mark_bad
+from lib.utils import create_directory
+from lib.utils import emapper_ofile_fmt, cr
+from lib.utils import corruption_test, mark_bad
+from lib.utils import highest_value_with_percentage
 
 def loadprots(file: str):
     '''
