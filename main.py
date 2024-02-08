@@ -18,7 +18,7 @@ def setargs():
     parser.add_argument('-annoxt', type=str, default="_emapper.annotations.tsv.gz", help='Annotation file extension')
     parser.add_argument('-minseqid', type=float, default=0.97, help='Minimum sequence identity')
     parser.add_argument('-threads', type=int, default=3, help='Number of threads')
-    parser.add_argument('-minocc', type=int, default=2, help='Minimum number of occurrences to keep a pOTU')
+    parser.add_argument('-minocc', type=int, default=2, help='Minimum number of occurrences to keep a OPU')
     parser.add_argument('-minlen', type=int, default=98, help='Minimum number of residues to consider true a protein')
     parser.add_argument('-xt', type=str, default='.faa.gz', help='Number of threads')
     parser.add_argument('-maxmem', type=str, default='10G', help='Maximum memory (10G default)')
@@ -105,14 +105,14 @@ def main():
     
     print("Wow, now we are clustering")
     
-    pOTU_table = cluster(f'{ofolder}/summed_prots.faa.gz',
+    OPU_table = cluster(f'{ofolder}/summed_prots.faa.gz',
                          ofolder,
                          minseqid,
                          minocc,
                          threads,
                          maxmem)
 
-    getannotations(pOTU_table,
+    getannotations(OPU_table,
                    ofolder,
                    annofolder,
                    annoxt)
