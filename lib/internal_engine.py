@@ -85,17 +85,17 @@ def process_cluster_table(cluster_df, minocc):
     print('# Aggregate cluster information')
     keep_otus = cluster_df.representative.value_counts()
     keep_otus = keep_otus[keep_otus >= minocc].index
-    pOTU_table = cluster_df.groupby(['representative', 'sample']).size().reset_index(name='number')
-    pOTU_table = pOTU_table[pOTU_table.representative.isin(keep_otus)]
-    print('# Pivot table for pOTU representation')
-    pOTU_table = pOTU_table.pivot_table(index='representative',
+    OPU_table = cluster_df.groupby(['representative', 'sample']).size().reset_index(name='number')
+    OPU_table = OPU_table[OPU_table.representative.isin(keep_otus)]
+    print('# Pivot table for OPU representation')
+    OPU_table = OPU_table.pivot_table(index='representative',
                                         columns='sample',
                                         values='number').fillna(0).astype('int').reset_index()
-    print('# Add pOTU column')
-    pOTU_table['pOTU'] = ['pOTU'+str(x) for x in pOTU_table.index]
+    print('# Add OPU column')
+    OPU_table['OPU'] = ['OPU'+str(x) for x in OPU_table.index]
     print('# Reorder columns')
-    pOTU_table = pOTU_table[['pOTU', 'representative', *pOTU_table.columns[1:-1]]]
-    return pOTU_table
+    OPU_table = OPU_table[['OPU', 'representative', *OPU_table.columns[1:-1]]]
+    return OPU_table
     
 
 def clean_up_files(ofolder):
@@ -104,20 +104,20 @@ def clean_up_files(ofolder):
 
 
 def cluster(infile, ofolder, minseqid=0.97, minocc=2, threads=3, maxmem='10G'):
-    print('# Making pOTU table')
+    print('# Making OPU table')
     run_clustering(infile, ofolder, minseqid, threads, maxmem)
 
     # Read cluster results
     cluster_df = pd.read_table(f'{ofolder}/result_cluster.tsv',
                                names=['representative', 'sequence']).drop_duplicates()
 
-    # Save pOTUs cluster relationship
-    cluster_df.to_csv(f'{ofolder}/pOTUs_cluster_relationship.tsv.xz',
+    # Save OPUs cluster relationship
+    cluster_df.to_csv(f'{ofolder}/OPUs_cluster_relationship.tsv.xz',
                       sep='\t', header=True, index=None)
   
-    # Save pOTU table
-    pOTU_table = process_cluster_table(cluster_df, minocc)
-    pOTU_table.to_csv(f'{ofolder}/pOTU_table.tsv.xz',
+    # Save OPU table
+    OPU_table = process_cluster_table(cluster_df, minocc)
+    OPU_table.to_csv(f'{ofolder}/OPU_table.tsv.xz',
                       sep='\t', header=True, index=None)
 
     # Compress representative sequence file
@@ -125,21 +125,21 @@ def cluster(infile, ofolder, minseqid=0.97, minocc=2, threads=3, maxmem='10G'):
 
     clean_up_files(ofolder)
 
-    return pOTU_table
+    return OPU_table
 
   
 def getannotations(df, ofolder, annofolder, annoxt):
     print('# Getting functions')
 
     print('# Load and merge dataframes')
-    df2 = pd.read_table(f'{ofolder}/pOTUs_cluster_relationship.tsv.xz')
-    df2 = df2.merge(df[['representative', 'pOTU']],
+    df2 = pd.read_table(f'{ofolder}/OPUs_cluster_relationship.tsv.xz')
+    df2 = df2.merge(df[['representative', 'OPU']],
                     on='representative').rename(columns={'sequence': 'seqname'})
 
     print('# Process each namefile')
     for idx, namefile in enumerate(glob(f'{ofolder}/*_rename.tsv.xz')):
         x = pd.read_table(namefile)
-        x = x[x.good_seq].merge(df2, on='seqname')[['originalname', 'pOTU']]
+        x = x[x.good_seq].merge(df2, on='seqname')[['originalname', 'OPU']]
         x['sample'] = x.originalname.apply(lambda w: w.split('.')[0])
 
         # Load and merge annotation file
@@ -158,15 +158,15 @@ def getannotations(df, ofolder, annofolder, annoxt):
 
     print('# Concatenate annotated files')
     W = pd.concat([pd.read_table(infile) for infile in glob(f'{ofolder}/annotation_result_*.tsv.xz')]).fillna('UNKNOWN')
-    W.to_csv(f'{ofolder}/general_pOTUs_annotation.tsv.xz',
+    W.to_csv(f'{ofolder}/general_OPUs_annotation.tsv.xz',
              sep='\t',
              header=True,
              index=None)
 
     print('# Summarize annotations')
-    W_grouped = W.groupby(['pOTU']).apply(lambda x: highest_value_with_percentage(dict(Counter(x.KEGG_ko))))
+    W_grouped = W.groupby(['OPU']).apply(lambda x: highest_value_with_percentage(dict(Counter(x.KEGG_ko))))
     W_grouped.reset_index().rename({0: 'annotation'},
-                                   axis=1).to_csv(f'{ofolder}/summarized_pOTUs_annotation.tsv.xz',
+                                   axis=1).to_csv(f'{ofolder}/summarized_OPUs_annotation.tsv.xz',
                                                   sep='\t',
                                                   header=True,
                                                   index=None)
