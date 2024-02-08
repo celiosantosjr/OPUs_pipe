@@ -21,7 +21,8 @@ def setargs():
     parser.add_argument('-minocc', type=int, default=2, help='Minimum number of occurrences to keep a pOTU')
     parser.add_argument('-minlen', type=int, default=98, help='Minimum number of residues to consider true a protein')
     parser.add_argument('-xt', type=str, default='.faa.gz', help='Number of threads')
-
+    parser.add_argument('-maxmem', type=str, default='10G', help='Maximum memory (10G default)')
+    
     return parser
 
     
@@ -35,6 +36,7 @@ def main():
     threads = args.threads
     annoxt = args.annoxt
     minlen = args.minlen
+    maxmem = args.maxmem
     xt = args.xt
     
     pfolder = args.pfolder
@@ -107,7 +109,8 @@ def main():
                          ofolder,
                          minseqid,
                          minocc,
-                         threads)
+                         threads,
+                         maxmem)
 
     getannotations(pOTU_table,
                    ofolder,
