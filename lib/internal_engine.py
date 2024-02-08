@@ -63,9 +63,10 @@ def clean_records(records: list, oname_table: str, oname_fasta: str, minsize=98)
             ofile.write(f'>{seqname}\n{protein}\n')
 
 
-def run_clustering(infile, ofolder, minseqid, threads):
+def run_clustering(infile, ofolder, minseqid, threads, maxmem):
     run(['mmseqs',
          'easy-linclust',
+         '--split-memory-limit', str(maxmem),
          '--cov-mode', '1',
          '--min-seq-id', str(minseqid),
          '--seq-id-mode', '1',
@@ -102,9 +103,9 @@ def clean_up_files(ofolder):
         os.remove(f'{ofolder}/{x}')
 
 
-def cluster(infile, ofolder, minseqid=0.97, minocc=2, threads=3):
+def cluster(infile, ofolder, minseqid=0.97, minocc=2, threads=3, maxmem='10G'):
     print('# Making pOTU table')
-    run_clustering(infile, ofolder, minseqid, threads)
+    run_clustering(infile, ofolder, minseqid, threads, maxmem)
 
     # Read cluster results
     cluster_df = pd.read_table(f'{ofolder}/result_cluster.tsv',
