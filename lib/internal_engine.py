@@ -140,10 +140,11 @@ def getannotations(df, ofolder, annofolder, annoxt):
     for idx, namefile in enumerate(glob(f'{ofolder}/*_rename.tsv.xz')):
         x = pd.read_table(namefile)
         x = x[x.good_seq].merge(df2, on='seqname')[['originalname', 'OPU']]
-        x['sample'] = x.originalname.apply(lambda w: w.split('.')[0])
+        x = x.reset_index(drop=True)
+        sample = x.loc[0, 'originalname'].split('.')[0]
 
         # Load and merge annotation file
-        annofile = annofolder + list(set(x['sample']))[0] + annoxt
+        annofile = annofolder + sample + annoxt
         annofile = pd.read_table(annofile,
                                  names=emapper_ofile_fmt)[['originalname', 'KEGG_ko']]
         x = x.merge(annofile,

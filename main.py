@@ -16,12 +16,12 @@ def setargs():
     parser.add_argument('-pfolder', type=str, required=True, help='Project folder path')
     parser.add_argument('-annofolder', type=str, help='Annotation folder path')
     parser.add_argument('-annoxt', type=str, default="_emapper.annotations.tsv.gz", help='Annotation file extension')
-    parser.add_argument('-minseqid', type=float, default=0.97, help='Minimum sequence identity')
+    parser.add_argument('-minseqid', type=float, default=0.975, help='Minimum sequence identity')
     parser.add_argument('-threads', type=int, default=3, help='Number of threads')
     parser.add_argument('-minocc', type=int, default=2, help='Minimum number of occurrences to keep a OPU')
-    parser.add_argument('-minlen', type=int, default=98, help='Minimum number of residues to consider true a protein')
-    parser.add_argument('-xt', type=str, default='.faa.gz', help='Number of threads')
-    parser.add_argument('-maxmem', type=str, default='10G', help='Maximum memory (10G default)')
+    parser.add_argument('-minlen', type=int, default=35, help='Minimum number of residues to consider true a protein')
+    parser.add_argument('-xt', type=str, default='.faa.gz', help='Protein sequences fasta file extension')
+    parser.add_argument('-maxmem', type=str, default='4G', help='Maximum memory (4G default)')
     
     return parser
 
