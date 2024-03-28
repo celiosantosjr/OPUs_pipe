@@ -88,9 +88,16 @@ def process_cluster_table(cluster_df, minocc):
     OPU_table = cluster_df.groupby(['representative', 'sample']).size().reset_index(name='number')
     OPU_table = OPU_table[OPU_table.representative.isin(keep_otus)]
     print('# Pivot table for OPU representation')
-    OPU_table = OPU_table.pivot_table(index='representative',
-                                        columns='sample',
-                                        values='number').fillna(0).astype('int').reset_index()
+    intdfs = []
+    for chunk in OPU_table.groupby(['representative']):
+        chunk = chunk.reset_index(name='representative')
+        chunk = chunk.pivot_table(index='representative',
+                                  columns='sample',
+                                  values='number')
+        intdfs.append(chunk)
+    OPU_table = pd.concat(intdfs).fillna(0).astype('int')
+    OPU_table = OPU_table.reset_index(name='representative')
+    del intdfs
     print('# Add OPU column')
     OPU_table['OPU'] = ['OPU'+str(x) for x in OPU_table.index]
     print('# Reorder columns')
