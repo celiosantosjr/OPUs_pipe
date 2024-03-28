@@ -92,6 +92,10 @@ def process_cluster_table(cluster_df, minocc):
                                       columns='sample',
                                       values='number').fillna(0).astype('int').reset_index()
     print('# Add OPU column')
+    pOTU_table['ssum'] = pOTU_table[pOTU_table.columns[1:]].sum(axis=1)
+    pOTU_table = pOTU_table.sort_values(by='ssum', ascending=False)
+    pOTU_table = pOTU_table.reset_index(drop=True)
+    pOTU_table = pOTU_table.drop('ssum', axis=1)
     OPU_table['OPU'] = ['OPU'+str(x) for x in OPU_table.index]
     print('# Reorder columns')
     OPU_table = OPU_table[['OPU', 'representative', *OPU_table.columns[1:-1]]]
